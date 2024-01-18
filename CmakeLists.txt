@@ -1,0 +1,47 @@
+# Minimum version of CMake required
+cmake_minimum_required(VERSION 3.10)
+
+# Project name
+project(NONGFire)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(USE_DEBUG ON)
+# set(CMAKE_CXX_COMPILER clang++)
+# set(CMAKE_C_COMPILER clang)
+
+# Source files
+set(SOURCES 
+    src/main.cpp
+    src/cli.cpp
+    src/fs.cpp
+    src/include/main.h
+    src/include/cli.h
+    src/include/fs.h
+)
+
+link_directories(libs/Net)
+include_directories(libs/Net/include)
+
+if(USE_DEBUG)
+    link_libraries(${CMAKE_SOURCE_DIR}/libs/Net/PocoNetd.lib)
+else()
+    link_libraries(${CMAKE_SOURCE_DIR}/libs/Net/PocoNet.lib)
+endif()
+
+# Add executable
+add_executable(NONGFire ${SOURCES})
+
+if(USE_DEBUG)
+    add_custom_command(TARGET NONGFire POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/libs/Net/PocoNetd.dll
+        $<TARGET_FILE_DIR:NONGFire>
+    )
+else()
+    add_custom_command(TARGET NONGFire POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/libs/Net/PocoNet.dll
+        $<TARGET_FILE_DIR:NONGFire>
+    )
+endif()
